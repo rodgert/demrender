@@ -23,7 +23,7 @@ template<size_t fwidth>
     buf[0] = 0;
     if (stm.read(buf.data(), buf.max_size()))
       {
-         std::string_view s{ std::begin(buf), std::end(buf) };
+         std::string_view s{ buf.data(), buf.max_size() };
          s.remove_prefix(std::min(s.find_first_not_of(" "), s.size()));
          return std::string{ s };
       }
@@ -83,12 +83,33 @@ private:
 
 class DEMRecord
 {
+    using vector_t = std::vector<int>;
+
 public:
   DEMRecord()
     : col_{ -1 }
   { }
 
   DEMRecord(DEMRecord&&) = default;
+
+  using iterator = vector_t::iterator;
+  using const_iterator = vector_t::const_iterator;
+
+  iterator
+  begin() noexcept
+  { return std::begin(elevations_); }
+
+  const_iterator
+  begin() const noexcept
+  { return std::begin(elevations_); }
+
+  iterator
+  end() noexcept
+  { return std::end(elevations_); }
+
+  const_iterator
+  end() const noexcept
+  { return std::end(elevations_); }
 
   friend std::istream&
   operator>>(std::istream& stm, DEMRecord& rec)
@@ -125,7 +146,7 @@ public:
     // and slurp it in
     if (stm.read(buf.data(), buf.size()))
     {
-      std::string_view s{ std::begin(buf), std::end(buf) };
+      std::string_view s{ buf.data(), buf.max_size() };
 
       s.remove_prefix(header_width); // discard record header
       for (auto block = 0; block < l; ++block)
