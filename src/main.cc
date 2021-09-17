@@ -83,7 +83,7 @@ private:
 
 class DEMRecord
 {
-    using vector_t = std::vector<int>;
+  using vector_t = std::vector<int>;
 
 public:
   DEMRecord()
@@ -92,20 +92,30 @@ public:
 
   DEMRecord(DEMRecord&&) = default;
 
-  using iterator = vector_t::iterator;
-  using const_iterator = vector_t::const_iterator;
+  int
+  column() const noexcept
+  { return col_; }
 
-  iterator
-  begin() noexcept
-  { return std::begin(elevations_); }
+  using const_reference = vector_t::const_reference;
+  using size_type = vector_t::size_type;
+
+  size_type
+  size() const
+  { return elevations_.size(); }
+
+  const_reference
+  at(size_type pos) const
+  { return elevations_.at(pos); }
+
+  const_reference
+  operator[](size_type pos) const
+  { return at(pos); }
+
+  using const_iterator = vector_t::const_iterator;
 
   const_iterator
   begin() const noexcept
   { return std::begin(elevations_); }
-
-  iterator
-  end() noexcept
-  { return std::end(elevations_); }
 
   const_iterator
   end() const noexcept
@@ -146,7 +156,7 @@ public:
     // and slurp it in
     if (stm.read(buf.data(), buf.size()))
     {
-      std::string_view s{ buf.data(), buf.max_size() };
+      std::string_view s{ std::begin(buf), std::end(buf) };
 
       s.remove_prefix(header_width); // discard record header
       for (auto block = 0; block < l; ++block)
@@ -196,7 +206,7 @@ public:
 
 private:
   int col_;
-  std::vector<int> elevations_;
+  vector_t elevations_;
 };
 
 class DEMFile
@@ -211,20 +221,26 @@ public:
   info() const noexcept
   { return info_; }
 
-  using iterator = vector_t::iterator;
-  using const_iterator = vector_t::const_iterator;
+  using const_reference = vector_t::const_reference;
+  using size_type = vector_t::size_type;
 
-  iterator
-  begin() noexcept
-  { return std::begin(records_); }
+  size_type
+  size() const
+  { return records_.size(); }
+
+  const_reference
+  at(size_type pos) const
+  { return records_.at(pos); }
+
+  const_reference
+  operator[](size_type pos) const
+  { return at(pos); }
+
+  using const_iterator = vector_t::const_iterator;
 
   const_iterator
   begin() const noexcept
   { return std::begin(records_); }
-
-  iterator
-  end() noexcept
-  { return std::end(records_); }
 
   const_iterator
   end() const noexcept
